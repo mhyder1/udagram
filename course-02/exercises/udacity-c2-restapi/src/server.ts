@@ -1,20 +1,22 @@
+require('dotenv').config();
 import express from 'express';
 import { sequelize } from './sequelize';
 
 import { IndexRouter } from './controllers/v0/index.router';
 
-import bodyParser from 'body-parser';
-
 import { V0MODELS } from './controllers/v0/model.index';
 
 (async () => {
+  //registers models
   await sequelize.addModels(V0MODELS);
+
+  //make sure db is in sync with server
   await sequelize.sync();
 
   const app = express();
   const port = process.env.PORT || 8080; // default port to listen
   
-  app.use(bodyParser.json());
+  app.use(express.json());
 
   //CORS Should be restricted
   app.use(function(req, res, next) {
