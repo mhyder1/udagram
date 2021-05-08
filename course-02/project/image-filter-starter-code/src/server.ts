@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import fs from 'fs'
 import path from 'path'
@@ -33,22 +33,21 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
   //! END @TODO1
 
-  app.get('/filteredimage', async (req, res, next) => {
-    // console.log(req.query)
+  app.get('/filteredimage', async (req: Request, res: Response) => {
     const { image_url } = req.query
     if(!image_url) {
-      res.send('Query parameter required')
+      res.status(400).send('Query parameter required')
     }
     try {
       const image = await filterImageFromURL(image_url)
-      res.sendFile(image)
+      res.status(200).sendFile(image)
     } catch(e) {
-      res.send('No image available: '+e)
+      res.status(404).send('No image available: '+e)
     } finally {
       const dir = path.join(__dirname, 'util', 'tmp')
       fs.readdir(dir, (err, files) => {
         if(err) {
-          res.send('no files available')
+          res.status(404).send('no files available')
         }
         files = files.map(file => path.join(dir, file))
         deleteLocalFiles(files)
@@ -58,7 +57,7 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   
   // Root Endpoint
   // Displays a simple message to the user {}
-  app.get( "/", async ( req, res ) => {
+  app.get( "/", async ( req: Request, res: Response ) => {
     res.send("try GET /filteredimage?image_url={{}}")
   } );
   
